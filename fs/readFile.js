@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 // 读取文本文件
-fs.readFile('sample.txt', 'utf-8', (err, data) => {
+fs.readFile('./assets/sample.txt', 'utf-8', (err, data) => {
   if (err) {
     console.log(err);
   } else {
@@ -11,7 +11,7 @@ fs.readFile('sample.txt', 'utf-8', (err, data) => {
 });
 
 // 读取二进制文件
-fs.readFile('demo.jpg', (err, data) => {
+fs.readFile('./assets/demo.jpg', (err, data) => {
   if (err) {
     console.log(err);
   } else {
