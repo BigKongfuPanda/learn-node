@@ -5,6 +5,14 @@
 - 同步读取文件
 - 写文件
 - stat
+- 文件是否存在
+- 创建目录
+- 删除文件
+- 读取目录
+- 文件重命名
+- 监听文件修改
+- 追加文件内容
+- 文件内容截取
 
 # 1、概述
 
@@ -162,4 +170,172 @@ isDirectory: false
 size: 72
 birth time: Fri Jun 22 2018 11:39:17 GMT+0800 (CST)
 modified time: Fri Jun 22 2018 14:27:53 GMT+0800 (CST)
+```
+
+# 6、文件是否存在
+
+`fs.exists()` 已经是 `deprecated` 的状态，可以通过 `fs.access()` 方法来判断文件是否存在。
+
+```js
+const fs = require('fs);
+
+fs.access('./assets/sample.txt', function(err) {
+  if(err) throw err;
+  console.log('sample.txt存在');
+});
+```
+
+`fs.access()` 除了判断文件是否存在（默认模式），还可以用来判断文件的权限。
+
+# 7、创建目录
+
+异步版本，如果目录存在，会报错
+
+```js
+const fs = require('fs);
+
+fs.mkdir('./assets/mkdir.txt', function(err){
+  if(err) throw err;
+  console.log('目录创建成功');
+});
+```
+
+同步版本
+
+```js
+const fs = require('fs');
+
+fs.mkdirSync('./assets/mkdir.txt');
+```
+
+# 8、删除文件
+
+删除文件使用 `fs.unlink()` 方法。
+
+```js
+fs.unlink('./assets/mkdir.txt', function(err){
+  if(err) throw err;
+  console.log('删除文件成功');
+})
+
+fs.unlinkSync('./assets/mkdir.txt');
+```
+
+但是删除文件需要权限，如果没有权限的话，会报错。
+
+# 9、读取目录
+
+使用 `fs.readDirSync()` 和 `fs.readDir()` 方法可以读取目录。注意：`fs.readdirSync()`只会读一层，所以需要判断文件类型是否目录，如果是，则进行递归遍历。
+
+```js
+const fs = require('fs');
+const path = require('path');
+
+const getFileInDir = function(dir){
+  let results = [];
+  let files = fs.readdirSync(dir, 'utf8');
+
+  files.forEach(function(file){
+    file = path.resolve(dir, file);
+
+    let stats = fs.statSync(file);
+    if (stats.isFile()) {
+      results.push(file);
+    } else if (stats.isDirectory()){
+      results = results.concat(getFileInDir(file));
+    }
+  });
+  return results;
+};
+
+let files = getFileInDir('../');
+console.log(files);
+```
+
+# 10、文件重命名
+
+使用 fs.rename() 方法可以对文件进行重命名。
+
+```js
+// fs.rename(oldPath, newPath, callback)
+const fs = require('fs');
+
+// 同步
+fs.renameSync('./assets/mkdir.txt', './assets/mkdir1.txt');
+
+// 异步
+fs.rename('', '', function(err){
+  if(err) throw err;
+  console.log('重命名成功');
+});
+```
+
+# 11、监听文件修改
+
+监听文件的方法有两个：`fs.watchFile()` 和 `fs.wath()`。
+
+注意：`fs.watch` 比 `fs.watchFile` 和 `fs.unwatchFile` 更高效。 可能的话，应该使用 `fs.watch` 而不是 `fs.watchFile` 和 `fs.unwatchFile`。
+
+## fs.watch
+
+回调中提供的 `filename` 参数仅在 Linux、macOS、Windows、以及 AIX 系统上支持。 即使在支持的平台中，`filename` 也不能保证提供。 因此，不要以为 `filename` 参数总是在回调中提供，如果它是空的，需要有一定的后备逻辑。
+
+```js
+fs.watch('./assets/mkdir1.txt', (eventType, filename) => {
+  console.log(`事件类型是：${eventType}`);
+  if (filename) {
+    console.log(`提供的文件名: ${filename}`);
+  } else {
+    console.log('未提供文件名');
+  }
+});
+```
+
+## fs.watchFile
+
+回调函数中有两个参数，当前的状态对象和以前的状态对象：
+
+```js
+fs.watchFile('./assets/mkdir.txt', (curr, prev) => {
+  console.log(`the current mtime is: ${curr.mtime}`);
+  console.log(`the previous mtime was: ${prev.mtime}`);
+});
+
+// the current mtime is: Tue Jun 26 2018 17:56:37 GMT+0800 (CST)
+// the previous mtime was: Tue Jun 26 2018 17:55:32 GMT+0800 (CST)
+```
+
+这里的状态对象是 `fs.Stat` 实例。
+
+## 可用性
+
+`fs.watch()` 这个接口并不是在所有的平台行为都一致，并且在某些情况下是不可用的。
+
+例如，当使用虚拟化软件如 Vagrant、Docker 等时，在网络文件系统（NFS、SMB 等）或主文件系统中监视文件或目录可能是不可靠的。
+
+您仍然可以使用基于 `stat` 轮询的 `fs.watchFile()` ，但是这种方法更慢，可靠性也更低。
+
+总之，虽然 `fs.watch()` 比 `fs.watchFile()` 更高效，但是 `fs.watch()` 的可用性不如 `fs.watchFile()`。
+
+# 12、追加文件内容
+
+异步地追加数据到一个文件，如果文件不存在则创建文件。 data 可以是一个字符串或 Buffer。
+
+```js
+fs.appendFile('./assets/mkdir.txt', 'data to append', (err) => {
+  if (err) throw err;
+  console.log('The "data to append" was appended to file!');
+});
+```
+
+如果 `options` 是一个字符串，则它指定了字符编码。例如：
+
+```js
+fs.appendFile('./assets/mkdir.txt', 'data to append', 'utf8', callback);
+```
+
+`file` 可能是一个被打开用来追加数据的数字文件描述符（通过 `fs.open()` 或者 `fs.openSync()`）。这样的文件描述符将不会被自动关闭，需要手动关闭。
+
+```js
+
 ```
