@@ -89,7 +89,7 @@ let buf = Buffer.from(text, 'utf-8');
 除了标准的异步读取模式外，`fs` 也提供相应的同步读取函数。同步读取的函数和异步函数相比，多了一个 `Sync` 后缀，并且不接收回调函数，函数直接返回结果。
 
 ```js
-const fs = require('fs);
+const fs = require('fs');
 let data = fs.readFileSync('sample.txt', 'utf-8');
 ```
 
@@ -98,7 +98,7 @@ let data = fs.readFileSync('sample.txt', 'utf-8');
 如果同步读取文件发生错误，则需要用 `try...catch` 捕获该错误：
 
 ```js
-const fs = require('fs);
+const fs = require('fs');
 
 try {
   let data = fs.readFileSync('sample.txt', 'utf-8');
@@ -177,7 +177,7 @@ modified time: Fri Jun 22 2018 14:27:53 GMT+0800 (CST)
 `fs.exists()` 已经是 `deprecated` 的状态，可以通过 `fs.access()` 方法来判断文件是否存在。
 
 ```js
-const fs = require('fs);
+const fs = require('fs');
 
 fs.access('./assets/sample.txt', function(err) {
   if(err) throw err;
@@ -189,10 +189,10 @@ fs.access('./assets/sample.txt', function(err) {
 
 # 7、创建目录
 
-异步版本，如果目录存在，会报错
+异步版本，如果目录存在，会报错
 
 ```js
-const fs = require('fs);
+const fs = require('fs');
 
 fs.mkdir('./assets/mkdir.txt', function(err){
   if(err) throw err;
@@ -223,7 +223,7 @@ fs.unlinkSync('./assets/mkdir.txt');
 
 但是删除文件需要权限，如果没有权限的话，会报错。
 
-# 9、读取目录
+# 9、读取目录
 
 使用 `fs.readDirSync()` 和 `fs.readDir()` 方法可以读取目录。注意：`fs.readdirSync()`只会读一层，所以需要判断文件类型是否目录，如果是，则进行递归遍历。
 
