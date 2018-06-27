@@ -6,13 +6,14 @@
 - 写文件
 - stat
 - 文件是否存在
-- 创建目录
 - 删除文件
-- 读取目录
 - 文件重命名
 - 监听文件修改
 - 追加文件内容
 - 文件内容截取
+- 创建目录
+- 读取目录
+- 删除目录
 
 # 1、概述
 
@@ -187,28 +188,7 @@ fs.access('./assets/sample.txt', function(err) {
 
 `fs.access()` 除了判断文件是否存在（默认模式），还可以用来判断文件的权限。
 
-# 7、创建目录
-
-异步版本，如果目录存在，会报错
-
-```js
-const fs = require('fs');
-
-fs.mkdir('./assets/mkdir.txt', function(err){
-  if(err) throw err;
-  console.log('目录创建成功');
-});
-```
-
-同步版本
-
-```js
-const fs = require('fs');
-
-fs.mkdirSync('./assets/mkdir.txt');
-```
-
-# 8、删除文件
+# 7、删除文件
 
 删除文件使用 `fs.unlink()` 方法。
 
@@ -223,36 +203,7 @@ fs.unlinkSync('./assets/mkdir.txt');
 
 但是删除文件需要权限，如果没有权限的话，会报错。
 
-# 9、读取目录
-
-使用 `fs.readDirSync()` 和 `fs.readDir()` 方法可以读取目录。注意：`fs.readdirSync()`只会读一层，所以需要判断文件类型是否目录，如果是，则进行递归遍历。
-
-```js
-const fs = require('fs');
-const path = require('path');
-
-const getFileInDir = function(dir){
-  let results = [];
-  let files = fs.readdirSync(dir, 'utf8');
-
-  files.forEach(function(file){
-    file = path.resolve(dir, file);
-
-    let stats = fs.statSync(file);
-    if (stats.isFile()) {
-      results.push(file);
-    } else if (stats.isDirectory()){
-      results = results.concat(getFileInDir(file));
-    }
-  });
-  return results;
-};
-
-let files = getFileInDir('../');
-console.log(files);
-```
-
-# 10、文件重命名
+# 8、文件重命名
 
 使用 fs.rename() 方法可以对文件进行重命名。
 
@@ -270,7 +221,7 @@ fs.rename('', '', function(err){
 });
 ```
 
-# 11、监听文件修改
+# 9、监听文件修改
 
 监听文件的方法有两个：`fs.watchFile()` 和 `fs.wath()`。
 
@@ -317,7 +268,9 @@ fs.watchFile('./assets/mkdir.txt', (curr, prev) => {
 
 总之，虽然 `fs.watch()` 比 `fs.watchFile()` 更高效，但是 `fs.watch()` 的可用性不如 `fs.watchFile()`。
 
-# 12、追加文件内容
+# 10、追加文件内容
+
+## 异步追加 fs.appendFile()
 
 异步地追加数据到一个文件，如果文件不存在则创建文件。 data 可以是一个字符串或 Buffer。
 > fs.appendFile(file, data[, options], callback)
@@ -355,3 +308,170 @@ fs.open('./assets/mkdir.txt', 'a', (err, fd) => {
   });
 });
 ```
+
+## 同步追加 fs.appendFileSync(path, data[, options])
+
+例子：
+
+```js
+try {
+  fs.appendFileSync('./assets/mkdir.txt', 'data to append');
+  console.log('The "data to append" was appended to file!');
+} catch (error) {
+  // handle the error
+}
+```
+如果 `options` 是一个字符串，则它指定了字符编码。例如：
+
+```js
+fs.appendFileSync('message.txt', 'data to append', 'utf8');
+```
+
+`file` 可能是一个被打开用来追加数据的数字文件描述符（通过 `fs.open()` 或者 `fs.openSync()`）。这样的文件描述符将不会被自动关闭，需要手动关闭。
+
+```js
+let fd;
+
+try {
+  fd = fs.openSync('./assets/mkdir.txt', 'a');
+  fs.appendFileSync(fd, 'data to append', 'utf8');
+} catch (error) {
+  // handle the error
+} finally {
+  if (fd !== undefined) {
+    fs.closeSync(fd);
+  }
+}
+```
+
+# 11、文件内容截取
+
+异步为 `fs.ftruncate`, 同步为 `fs.ftruncateSyn`
+
+> fs.ftruncate(fd[, len], callback)
+> - fd <integer>
+> - len <integer> 默认 = 0
+> - callback <Function>
+>   - err <Error>
+
+如果文件描述符指向的文件大于 `len` 个字节，则只有前面 `len` 个字节会保留在文件中。
+
+例子，下面的程序会只保留文件前四个字节。
+
+```js
+console.log(fs.readFileSync('./assets/mkdir.txt', 'utf8'));
+// 输出: Node.js
+
+// 获取要截断的文件的文件描述符
+const fd = fs.openSync('./assets/mkdir.txt', 'r+');
+
+// 截断文件至前4个字节
+fs.ftruncate(fd, 4, (err) => {
+  if (err) {
+    throw err;
+  }
+  console.log(fs.readFileSync('./assets/mkdir.txt', 'utf8'));
+});
+// 输出：Node
+```
+
+如果前面的文件小于 `len` 个字节，则扩展文件，且扩展的部分用空字节（'\0'）填充。例子：
+
+```js
+console.log(fs.readFileSync('./assets/mkdir.txt', 'utf8'));
+// 输出: Node.js
+
+// 获取要截断的文件的文件描述符
+const fd = fs.openSync('./assets/mkdir.txt', 'r+');
+
+// 截断文件至前10个字节，但实际大小是7个字节
+fs.ftruncate(fd, 10, (err) => {
+  if (err) {
+    throw err;
+  }
+  console.log(fs.readFileSync('./assets/mkdir.txt'));
+});
+// 输出: <Buffer 4e 6f 64 65 2e 6a 73 00 00 00>
+// ('Node.js\0\0\0' in UTF8)
+```
+
+最后3个字节是空字节（'\0'），用于补充超出的截断。
+
+
+# 12、创建目录
+
+异步版本，如果目录存在，会报错
+
+```js
+const fs = require('fs');
+
+fs.mkdir('./assets/mkdir.txt', function(err){
+  if(err) throw err;
+  console.log('目录创建成功');
+});
+```
+
+同步版本
+
+```js
+const fs = require('fs');
+
+fs.mkdirSync('./assets/mkdir.txt');
+```
+
+# 13、读取目录
+
+使用 `fs.readDirSync()` 和 `fs.readDir()` 方法可以读取目录。注意：`fs.readdirSync()`只会读一层，所以需要判断文件类型是否目录，如果是，则进行递归遍历。
+
+```js
+const fs = require('fs');
+const path = require('path');
+
+const getFileInDir = function(dir){
+  let results = [];
+  let files = fs.readdirSync(dir, 'utf8');
+
+  files.forEach(function(file){
+    file = path.resolve(dir, file);
+
+    let stats = fs.statSync(file);
+    if (stats.isFile()) {
+      results.push(file);
+    } else if (stats.isDirectory()){
+      results = results.concat(getFileInDir(file));
+    }
+  });
+  return results;
+};
+
+let files = getFileInDir('../');
+console.log(files);
+```
+
+# 14、删除目录
+
+异步版本
+> fs.rmdir(path, callback)
+
+同步版本
+>fs.rmdirSync(path)
+
+```js
+// 异步
+fs.rmdir('./assets/mkdir.txt', (err) => {
+  if (err) {
+    throw err;
+  }
+  console.log('删除成功');
+});
+
+// 同步
+try {
+  fs.rmdirSync('./assets/mkdir.txt');
+} catch (err) {
+  console.log(err);
+}
+```
+
+
+
