@@ -200,7 +200,7 @@ fs.access('./assets/sample.txt', function(err) {
 >   - w 模式: 以写入模式打开文件。文件会被创建（如果文件不存在）或截断（如果文件存在）。
 >   - a 模式: 以追加模式打开文件。如果文件不存在，则会被创建。
 > - mode: 设置文件模式（权限和 sticky 位）
-> - callback(err, fd): fd 为所打开的文件描述符，一般为一个整数
+> - callback(err, fd): fd 为所打开的文件描述符，一般为一个整数
 
 ```js
 // 异步打开文件
