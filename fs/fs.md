@@ -6,6 +6,7 @@
 - 写文件
 - stat
 - 文件是否存在
+- 打开和关闭文件
 - 删除文件
 - 文件重命名
 - 监听文件修改
@@ -188,7 +189,38 @@ fs.access('./assets/sample.txt', function(err) {
 
 `fs.access()` 除了判断文件是否存在（默认模式），还可以用来判断文件的权限。
 
-# 7、删除文件
+# 7、打开和关闭文件
+
+打开文件
+
+> fs.open(path, flags[, mode], callback)
+> - path: 文件路径
+> - flags： 文件打开模式。许多种模式, r, w, a 模式。
+>   - r 模式: 以读取模式打开文件。如果文件不存在则发生异常。
+>   - w 模式: 以写入模式打开文件。文件会被创建（如果文件不存在）或截断（如果文件存在）。
+>   - a 模式: 以追加模式打开文件。如果文件不存在，则会被创建。
+> - mode: 设置文件模式（权限和 sticky 位）
+> - callback(err, fd): fd 为所打开的文件描述符，一般为一个整数
+
+```js
+// 异步打开文件
+fs.open('./assets/mkdir.txt', 'a+', (err, fd) => {
+  if (err) throw err;
+  // do something
+  
+  // 关闭文件
+  fs.close(fd, (err) => {
+    if (err) throw err;
+  });
+});
+
+// 同步打开文件, 返回的是一个表示文件描述符的整数
+let fd = fs.openSync('./assets/mkdir.txt', 'a+');
+fs.closeSync(fd);
+```
+
+
+# 8、删除文件
 
 删除文件使用 `fs.unlink()` 方法。
 
@@ -203,7 +235,7 @@ fs.unlinkSync('./assets/mkdir.txt');
 
 但是删除文件需要权限，如果没有权限的话，会报错。
 
-# 8、文件重命名
+# 9、文件重命名
 
 使用 fs.rename() 方法可以对文件进行重命名。
 
@@ -221,7 +253,7 @@ fs.rename('', '', function(err){
 });
 ```
 
-# 9、监听文件修改
+# 10、监听文件修改
 
 监听文件的方法有两个：`fs.watchFile()` 和 `fs.wath()`。
 
@@ -268,7 +300,7 @@ fs.watchFile('./assets/mkdir.txt', (curr, prev) => {
 
 总之，虽然 `fs.watch()` 比 `fs.watchFile()` 更高效，但是 `fs.watch()` 的可用性不如 `fs.watchFile()`。
 
-# 10、追加文件内容
+# 11、追加文件内容
 
 ## 异步追加 fs.appendFile()
 
@@ -344,7 +376,7 @@ try {
 }
 ```
 
-# 11、文件内容截取
+# 12、文件内容截取
 
 异步为 `fs.ftruncate`, 同步为 `fs.ftruncateSyn`
 
@@ -398,7 +430,7 @@ fs.ftruncate(fd, 10, (err) => {
 最后3个字节是空字节（'\0'），用于补充超出的截断。
 
 
-# 12、创建目录
+# 13、创建目录
 
 异步版本，如果目录存在，会报错
 
@@ -419,7 +451,7 @@ const fs = require('fs');
 fs.mkdirSync('./assets/mkdir.txt');
 ```
 
-# 13、读取目录
+# 14、读取目录
 
 使用 `fs.readDirSync()` 和 `fs.readDir()` 方法可以读取目录。注意：`fs.readdirSync()`只会读一层，所以需要判断文件类型是否目录，如果是，则进行递归遍历。
 
@@ -448,7 +480,7 @@ let files = getFileInDir('../');
 console.log(files);
 ```
 
-# 14、删除目录
+# 15、删除目录
 
 异步版本
 > fs.rmdir(path, callback)
