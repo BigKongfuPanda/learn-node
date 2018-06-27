@@ -320,6 +320,14 @@ fs.watchFile('./assets/mkdir.txt', (curr, prev) => {
 # 12、追加文件内容
 
 异步地追加数据到一个文件，如果文件不存在则创建文件。 data 可以是一个字符串或 Buffer。
+> fs.appendFile(file, data[, options], callback)
+
+- file： 可以是文件路径，也可以是文件描述符。
+- data：要追加的内容。string或者buffer。
+- options
+    - encoding: 编码，默认是 `utf-8`
+    - mode: 默认是 `0o666`
+    - flag: 默认是 `a`
 
 ```js
 fs.appendFile('./assets/mkdir.txt', 'data to append', (err) => {
@@ -337,5 +345,13 @@ fs.appendFile('./assets/mkdir.txt', 'data to append', 'utf8', callback);
 `file` 可能是一个被打开用来追加数据的数字文件描述符（通过 `fs.open()` 或者 `fs.openSync()`）。这样的文件描述符将不会被自动关闭，需要手动关闭。
 
 ```js
-
+fs.open('./assets/mkdir.txt', 'a', (err, fd) => {
+  if (err) throw err;
+  fs.appendFile(fd, 'data to append', 'utf8', (err) => {
+    fs.close(fd, (err) => {
+      if (err) throw err;
+    });
+    if (err) throw err;
+  });
+});
 ```
