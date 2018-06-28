@@ -253,7 +253,7 @@ path.relative('./path.md', '');
 
 `path.isAbsolute()` 方法会判定 `path` 是否为一个绝对路径。
 
-如果给定的 `path` 是一个长度为零的字符串，则返回 `false`。
+如果给定的 `path` 是一个长度为零的字符串，则返回 `false`。
 
 ```js
 path.isAbsolute('/foo/bar'); // true
@@ -262,3 +262,8 @@ path.isAbsolute('qux/');     // false
 path.isAbsolute('.');        // false
 ```
 
+# 参考资料
+
+[模块概览](https://github.com/chyingp/nodejs-learning-guide/blob/master/%E6%A8%A1%E5%9D%97/path.md)
+
+[Node.js 中文官网](http://nodejs.cn/api/path.html#path_path_dirname_path)
