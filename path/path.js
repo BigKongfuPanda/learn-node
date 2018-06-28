@@ -1,5 +1,4 @@
 var path = require('path');
 
-// 输出 '/foo/bar/baz/asdf'
-let url = path.join('/foo', '../bar', 'baz/asdf', 'quux', '..');
+let url = path.parse('/home/user/dir/file/');
 console.log(url);

@@ -4,6 +4,7 @@
 - 路径组合
 - 路径解析
 - 获取相对路径
+- 判断是否为绝对路径
 
 # 1、获取路径/文件名/拓展名
 
@@ -137,13 +138,127 @@ path.resolve('wwwroot', 'static_files/png/', '../gif/image.gif');
 
 # 3、路径解析
 
-- path.normalize(filepath)
-- path.parse(filepath)
-- path.format(filepath)
+- path.normalize(path)
+- path.parse(path)
+- path.format(path)
+
+## 3.1 path.normalize
+
+`path.normalize(path)` 方法会规范化给定的 `path`，并解析 `'..'` 和 `'.'` 片段。
+
+- 当发现多个连续的路径分隔符时（如 POSIX 上的 `/` 与 Windows 上的 `\` 或 `/`），它们会被单个的路径分隔符来代替。
+- 末尾的多个分隔符会被保留。
+- 如果 `path` 是一个空字符串，则返回 `'.'`，表示当前工作目录。
+
+```js
+path.normalize('/foo/bar//baz/asdf/quux/..');
+// 返回: '/foo/bar/baz/asdf'，解析了 .. ，返回了上一层目录
+
+path.normalize('/foo/bar//baz/asdf/quux/.');
+// 返回: '/foo/bar/baz/asdf/quux'，解析了 . 
+
+path.normalize('/foo/bar//baz/asdf/quux/');
+// 返回: '/foo/bar/baz/asdf/quux/'
+
+path.normalize('/foo/bar//baz/asdf/quux//');
+// 返回: '/foo/bar/baz/asdf/quux/', 末尾的多个分隔符，只保留了一个
+
+path.normalize('');
+// 返回：'.'，表示当前工作目录
+```
+
+# 3.2 path.parse(path)
+
+`path.parse()` 方法返回一个对象，对象的属性表示 `path` 的元素。 尾部文件分隔符会被忽略。
+
+```js
+path.parse('/home/user/dir/file.txt');
+// 返回:
+// { root: '/',
+//   dir: '/home/user/dir',
+//   base: 'file.txt',
+//   ext: '.txt',
+//   name: 'file' }
+
+path.parse('/home/user/dir/file/');
+// 返回:
+// { root: '/',
+//   dir: '/home/user/dir',
+//   base: 'file',
+//   ext: '',
+//   name: 'file' }
+// 尾部的文件分隔符会被忽略
+```
 
 
+# 3.3 path.format(pathObject)
+
+`path.format()` 方法会从一个对象返回一个路径字符串。 与 `path.parse()` 相反。
+
+当 `pathObject` 提供的属性有组合时，有些属性的优先级比其他的高：
+- 如果提供了 `pathObject.dir`, 则 `pathObject.root` 会被忽略；
+- 如果提供了 `pathObject.base` 存在，则 `pathObject.ext` 和 `pathObject.name` 会被忽略
+
+```js
+// 如果提供了 `dir`、`root` 和 `base`，则返回 `${dir}${path.sep}${base}`。
+// `root` 会被忽略。
+path.format({
+  root: '/ignored',
+  dir: '/home/user/dir',
+  base: 'file.txt'
+});
+// 返回: '/home/user/dir/file.txt'
+
+// 如果没有指定 `dir`，则 `root` 会被使用。
+// 如果只提供了 `root` 或 `dir` 等于 `root`，则平台的分隔符不会被包含。
+// `ext` 会被忽略。
+path.format({
+  root: '/',
+  base: 'file.txt',
+  ext: 'ignored'
+});
+// 返回: '/file.txt'
+
+// 如果没有指定 `base`，则 `name` + `ext` 会被使用。
+path.format({
+  root: '/',
+  name: 'file',
+  ext: '.txt'
+});
+// 返回: '/file.txt'
+```
 
 # 4、获取相对路径
 
 - path.relative(from, to)
+
+描述：从 `from` 路径，到 `to` 路径的相对路径（基于当前工作目录）
+
+边界：
+- 如果`from`， `to` 指向同个路径，那么返回空字符串；
+- 如果`from`， `to` 中任一者为空，则当前工作目录会被用于代替空字符串
+
+```js
+path.relative('/data/orandea/test/aaa', '/data/orandea/impl/bbb');
+// 返回: '../../impl/bbb'
+
+path.relative('/data/orandea', '/data/orandea');
+// 返回: ''
+
+path.relative('./path.md', '');
+// 返回: '..'
+```
+
+# 5、判断是否为绝对路径 path.isAbsolute(path)
+
+`path.isAbsolute()` 方法会判定 `path` 是否为一个绝对路径。
+
+如果给定的 `path` 是一个长度为零的字符串，则返回 `false`。
+
+```js
+path.isAbsolute('/foo/bar'); // true
+path.isAbsolute('/baz/..');  // true
+path.isAbsolute('qux/');     // false
+path.isAbsolute('.');        // false
+```
 
