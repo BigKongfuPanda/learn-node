@@ -2,7 +2,7 @@
 
 - 模块的定义
 - 模块包装器
-- 模块内部作用域
+- 模块内部作用域
 - module 对象
 - 模块导入策略
 - module.exports 和 exports 的区别
@@ -11,7 +11,7 @@
 
 在 Node.js 模块系统中，每个文件都被视为独立的模块。
 
-通过 module.exports 或者 exports 来导出所需要导出的变量、对象或者函数。
+通过 module.exports 或者 exports 来导出所需要导出的变量、对象或者函数。
 
 通过 require() 来导入所需要的模块。
 
@@ -36,10 +36,10 @@ console.log('The area of a circle of radius 4 is ' + circle.area(4));
 通过这样做，Node.js 实现了以下几点：
 
 - 它保持了顶层的变量（用 `var`、`const` 或 `let` 定义）作用在模块范围内，而不是全局对象。
-- 它有助于提供一些看似全局的但实际上是模块特定的变量，`exprots`、`require`、`module`、`__filename`、`__dirname` 均为模块内部的变量。
+- 它有助于提供一些看似全局的但实际上是模块特定的变量，`exprots`、`require`、`module`、`__filename`、`__dirname` 均为模块内部的变量。
 
 
-# 3、模块内部作用域
+# 3、模块内部作用域
 
 一个文件就是一个模块，在模块内部，存在一个独立的作用域，在该作用域下，存在一些模块特定的变量，不需要手动显式引入，既可以直接使用，如：`exprots`、`require`、`module`、`__filename`、`__dirname`。
 
@@ -233,6 +233,6 @@ NODE_MODULES_PATHS(START)
 
 # 5、module.exports 和 exports 的区别
 
-`exports` 是 `module` 对象的一个属性，在模块进行初始化的时候，为一个空对象，即 `module.exports = {}`，而 `exports` 是一个变量，其指向 `module.exports` 对象，即 `module.exports === exports`。实际起作用的是 `module.exports`， `exports` 只是一个辅助的变量。模块最终返回module.exports给调用者，而不是exports。
+`exports` 是 `module` 对象的一个属性，在模块进行初始化的时候，为一个空对象，即 `module.exports = {}`，而 `exports` 是一个变量，其指向 `module.exports` 对象，即 `module.exports === exports`。实际起作用的是 `module.exports`， `exports` 只是一个辅助的变量。模块最终返回module.exports给调用者，而不是exports。
 
 `exports` 所做的事情是收集属性，如果 `module.exports` 当前没有任何属性的话， `exports` 会把这些属性赋予 `module.exports` 。如果 `module.exports` 已经存在一些属性的话，那么 `exports` 中所用的东西都会被忽略。
