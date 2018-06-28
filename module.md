@@ -21,7 +21,7 @@
 Node.js 在编译 js 文件的过程中实际完成的步骤有对 js 文件内容进行头尾包装。以 foo.js 为例,包装之后的 foo.js 将会变成以下形式:
 
 ```js
-// app.js
+// foo.js
 var circle = require('./circle.js');
 console.log('The area of a circle of radius 4 is ' + circle.area(4));
 
@@ -236,3 +236,11 @@ NODE_MODULES_PATHS(START)
 `exports` 是 `module` 对象的一个属性，在模块进行初始化的时候，为一个空对象，即 `module.exports = {}`，而 `exports` 是一个变量，其指向 `module.exports` 对象，即 `module.exports === exports`。实际起作用的是 `module.exports`， `exports` 只是一个辅助的变量。模块最终返回module.exports给调用者，而不是exports。
 
 `exports` 所做的事情是收集属性，如果 `module.exports` 当前没有任何属性的话， `exports` 会把这些属性赋予 `module.exports` 。如果 `module.exports` 已经存在一些属性的话，那么 `exports` 中所用的东西都会被忽略。
+
+# 参考资料
+
+[【深入浅出Node.js系列三】深入Node.js的模块机制](https://blog.csdn.net/zhangyuan19880606/article/details/51508699)
+
+[Node.js模块系统](http://www.runoob.com/nodejs/nodejs-module-system.html)
+
+[Node.js 中文官网](http://nodejs.cn/api/modules.html)
