@@ -5,6 +5,7 @@
 - 模块内部作用域
 - module 对象
 - 模块导入策略
+- 循环依赖
 - module.exports 和 exports 的区别
 
 # 1、模块的定义
@@ -42,6 +43,8 @@ console.log('The area of a circle of radius 4 is ' + circle.area(4));
 # 3、模块内部作用域
 
 一个文件就是一个模块，在模块内部，存在一个独立的作用域，在该作用域下，存在一些模块特定的变量，不需要手动显式引入，既可以直接使用，如：`exprots`、`require`、`module`、`__filename`、`__dirname`。
+
+CommonJS 模块的顶层 `this` 指向当前模块。
 
 ## 3.1 __dirname
 
@@ -158,23 +161,24 @@ console.log(x.a);
 
 由于 Node.js 中存在 4 类模块（原生模块和3种文件模块），尽管 `require` 方法极其简单，但是内部的加载却是十分复杂的，其加载优先级也各自不同。
 
-## 4.1 从文件模块缓存中加载
+## 5.1 从文件模块缓存中加载
 
 尽管原生模块与文件模块的优先级不同，但是都会优先从文件模块的缓存中加载已经存在的模块。
 
-## 4.2 从原生模块加载
+## 5.2 从原生模块加载
 
 原生模块的优先级仅次于文件模块缓存的优先级。`require` 方法在解析文件名之后，优先检查模块是否在原生模块列表中。以 `http` 模块为例，尽管在目录下存在一个 http/http.js/http.node/http.json 文件，`require("http")` 都不会从这些文件中加载，而是从原生模块中加载。
 
 原生模块也有一个缓存区，同样也是优先从缓存区加载。如果缓存区没有被加载过，则调用原生模块的加载方式进行加载和执行。
 
-## 4.3 从文件加载
+## 5.3 从文件加载
 
 当文件模块缓存中不存在，而且不是原生模块的时候，Node.js 会解析 `require` 方法传入的参数，并从文件系统中加载实际的文件，这里我们将详细描述查找文件模块的过程，其中，也有一些细节值得知晓。
 
 如果按确切的文件名没有找到模块，则 Node.js 会尝试带上 `.js`、`.json` 或 `.node` 拓展名再加载。`.js` 文件会被解析为 JavaScript 文本文件，`.json` 文件会被解析为 JSON 文本文件。 `.node` 文件会被解析为通过 dlopen 加载的编译后的插件模块。
 
 `require` 方法接受以下几种参数的传递：
+
 - http、fs、path等，原生模块。
 - ./mod或../mod，相对路径的文件模块。
 - /pathtomodule/mod，绝对路径的文件模块。
@@ -231,7 +235,65 @@ NODE_MODULES_PATHS(START)
 5. return DIRS
 ```
 
-# 5、module.exports 和 exports 的区别
+# 6、循环依赖
+
+“循环加载”（circular dependency）指的是，a 脚本的执行依赖 b 脚本，而b脚本的执行又依赖 a 脚本。
+
+```js
+// a.js
+var b = require('b');
+
+// b.js
+var a = require('a');
+```
+
+通常，“循环加载”表示存在强耦合，如果处理不好，还可能导致递归加载，使得程序无法执行，因此应该避免出现。
+
+CommonJS 模块的重要特性是加载时执行，即脚本代码在 `require` 的时候，就会全部执行。一旦出现某个模块被"循环加载"，就只输出已经执行的部分，还未执行的部分不会输出。
+
+官方文档上面有一个循环加载的例子。
+
+```js
+// a.js
+console.log('a 开始');
+exports.done = false;
+const b = require('./b.js');
+console.log('在 a 中，b.done = %j', b.done);
+exports.done = true;
+console.log('a 结束');
+
+// b.js
+console.log('b 开始');
+exports.done = false;
+const a = require('./a.js');
+console.log('在 b 中，a.done = %j', a.done);
+exports.done = true;
+console.log('b 结束');
+
+// main.js
+console.log('main 开始');
+const a = require('./a.js');
+const b = require('./b.js');
+console.log('在 main 中，a.done=%j，b.done=%j', a.done, b.done);
+```
+
+当 `main.js` 加载 `a.js` 时，`a.js` 又加载 `b.js`。 此时，`b.js` 会尝试去加载 `a.js`。 为了防止无限的循环，会返回一个 `a.js` 的 `exports` 对象的 未完成的副本 给 `b.js` 模块。 然后 `b.js` 完成加载，并将 `exports` 对象提供给 `a.js` 模块。
+
+当 `main.js` 加载这两个模块时，它们都已经完成加载。 因此，该程序的输出会是：
+
+```js
+$ node main.js
+main 开始
+a 开始
+b 开始
+在 b 中，a.done = false
+b 结束
+在 a 中，b.done = true
+a 结束
+在 main 中，a.done=true，b.done=true
+```
+
+# 7、module.exports 和 exports 的区别
 
 `exports` 是 `module` 对象的一个属性，在模块进行初始化的时候，为一个空对象，即 `module.exports = {}`，而 `exports` 是一个变量，其指向 `module.exports` 对象，即 `module.exports === exports`。实际起作用的是 `module.exports`， `exports` 只是一个辅助的变量。模块最终返回module.exports给调用者，而不是exports。
 
