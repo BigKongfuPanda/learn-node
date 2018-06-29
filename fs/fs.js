@@ -8,3 +8,4 @@ fs.rmdir('./assets/mkdir.txt', (err) => {
   console.log('删除成功');
 });
 
+
