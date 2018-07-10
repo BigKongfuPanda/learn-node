@@ -128,7 +128,7 @@ $ node --harmony script.js --version
 
 `process.stdin` 和 `process.stdout` 分别代表进程的标准输入和标准输出，输入和输出都是从命令行中进行的。
 
-例如官网的例子，要求用户输入两个数值，然后把二者之和输出到终端。
+例如官网的例子，要求用户输入两个数值，然后把二者之和输出到终端。
 
 ```js
 /*1:声明变量*/
@@ -148,7 +148,7 @@ process.stdin.on('data', function (chunk) {
 });
 ```
 
-通过命令行运行上面的程序后，会让输入两个数值，然后会输出二者之和，如下所示：
+通过命令行运行上面的程序后，会让输入两个数值，然后会输出二者之和，如下所示：
 
 ```js
 请输入num1的值：1
@@ -172,7 +172,7 @@ process.stdin.on('data', function (chunk) {
 
 `process.connected` 属性返回的是一个布尔值，代表的是进程间是否连接，如果连接，则返回 `true`，反之为 `false`。
 
-调用 `process.disconnected` 后，`process.connected` 返回为 `false`。
+调用 `process.disconnected` 后，`process.connected` 返回为 `false`。
 
 `process.connected` 如果为 `false`，则不能通过 IPC channel 使用 `process.send()` 发送信息。
 
@@ -202,11 +202,11 @@ $ node process.js
 
 ## 3.4 process.chdir()
 
-更改 Node.js 进程所执行的目录。参数为 `directory`，表示文件目录，如果失败则抛出异常。
+更改 Node.js 进程所执行的目录。参数为 `directory`，表示文件目录，如果失败则抛出异常。
 
 ## 3.5 process.exit([code])
 
-`process.exit()` 方法以结束状态码 `code` 指示 Node.js 同步终止进程。 如果 `code` 未提供，此 `exit` 方法要么使用'success' 状态码 0（一般在 linux 中，0 表示成功状态吗，非 0 表示失败状态码），要么使用 `process.exitCode` 属性值，前提是此属性已被设置。 Node.js在所有'exit'事件监听器都被调用了以后，才会终止进程。
+`process.exit()` 方法以结束状态码 `code` 指示 Node.js 同步终止进程。 如果 `code` 未提供，此 `exit` 方法要么使用 'success' 状态码 0（一般在 linux 中，0 表示成功状态吗，非 0 表示失败状态码），要么使用 `process.exitCode` 属性值，前提是此属性已被设置。 Node.js在所有'exit'事件监听器都被调用了以后，才会终止进程。
 
 process.exit() 未指定 参数 `code`时：
 
@@ -219,7 +219,7 @@ process.exitCode = 1;
 process.exit(); // 使用状态码1
 ```
 
-如果指定了 `code`，则，执行 Node.js 的 shell 应该会得到结束状态码。即使设置了 `process.exitCode` 属性值，也会被 `process.exit(code)` 中的参数 `code` 所替换，即结束状态码使用指定的参数 `code`。
+如果指定了 `code`，则，执行 Node.js 的 shell 应该会得到结束状态码。即使设置了 `process.exitCode` 属性值，也会被 `process.exit(code)` 中的参数 `code` 所替换，即结束状态码使用指定的参数 `code`。
 
 ```js
 process.exitCode = 1; // 设置 exitCode
@@ -232,9 +232,9 @@ process.exit(2); // 使用状态码2
 - 写数据到 `process.stdout` 之后，立即调用 `process.exit()` 是不保险的，因为在 node 里面，往 `stdout` 写数据是非阻塞的，可以跨越多个事件循环。于是，可能写到一半就跪了。比较保险的做法是，通过 `process.exitCode` 设置退出码，然后等进程自动退出。
 - 如果程序出现异常，必须退出不可，那么，可以抛出一个未被捕获的 `error` ，来终止进程，这个比 `process.exit()` 安全。
 
-一个简单的例子，当满足一定条件时，使用 `process.exit()` 退出当前的进程，并且在进程退出时打印状态码 `code`。
-
 总之： `process.exit()` 接口不太靠谱，使用时请慎重。
+
+一个简单的例子，当满足一定条件时，使用 `process.exit()` 退出当前的进程，并且在进程退出时打印状态码 `code`。
 
 ```js
 // 监听进程 exit 事件
