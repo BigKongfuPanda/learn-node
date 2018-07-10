@@ -172,7 +172,7 @@ process.stdin.on('data', function (chunk) {
 
 `process.connected` 属性返回的是一个布尔值，代表的是进程间是否连接，如果连接，则返回 `true`，反之为 `false`。
 
-调用 `process.disconnected` 后，`process.connected` 返回为 `false`。
+调用 `process.disconnected` 后，`process.connected` 返回为 `false`。
 
 `process.connected` 如果为 `false`，则不能通过 IPC channel 使用 `process.send()` 发送信息。
 
