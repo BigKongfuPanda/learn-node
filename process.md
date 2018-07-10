@@ -178,35 +178,145 @@ process.stdin.on('data', function (chunk) {
 
 # 3、 方法
 
-## 3.1 process.nextTick(fn)
+## 3.1 process.nextTick(callback)
 
+`process.nextTick()` 方法将 `callback` 添加到"next tick 队列"。 一旦当前事件轮询队列的任务全部完成，在 next tick 队列中的所有 `callbacks` 会被依次调用，`nextTick` 中的 `calllback` 会优先于所有的 I/O 事件执行，比如 `ajax`，`setTimeout`，`promise.then()`。
+
+- `process.nextTick(callback)` 将 `callback` 放到 node 事件循环的 下一个 tick 里；
+- `process.nextTick(callback)` 比 `setTimetout(callback, 0)` 性能高；
 
 ## 3.2 process.abort()
 
+`process.abort()` 方法会使 Node.js 进程立即结束，并生成一个 core 文件。
+
 ## 3.3 process.cwd()
+
+`process cwd()` 方法返回 Node.js 进程当前工作的目录。
+
+```js
+//执行命令
+$ node process.js
+//输出
+/Users/yp-tc-m2504/Documents/practise/node/learn-node
+```
 
 ## 3.4 process.chdir()
 
+更改 Node.js 进程所执行的目录。参数为 `directory`，表示文件目录，如果失败则抛出异常。
+
 ## 3.5 process.exit([code])
+
+`process.exit()` 方法以结束状态码 `code` 指示 Node.js 同步终止进程。 如果 `code` 未提供，此 `exit` 方法要么使用'success' 状态码 0（一般在 linux 中，0 表示成功状态吗，非 0 表示失败状态码），要么使用 `process.exitCode` 属性值，前提是此属性已被设置。 Node.js在所有'exit'事件监听器都被调用了以后，才会终止进程。
+
+process.exit() 未指定 参数 `code`时：
+
+```js
+// 未设置 process.exitCode 的属性值，则使用状态码0
+process.exit(); // 使用状态码 0
+
+//设置了 process.exitCode 的属性值，则该属性值
+process.exitCode = 1; 
+process.exit(); // 使用状态码1
+```
+
+如果指定了 `code`，则，执行 Node.js 的 shell 应该会得到结束状态码。即使设置了 `process.exitCode` 属性值，也会被 `process.exit(code)` 中的参数 `code` 所替换，即结束状态码使用指定的参数 `code`。
+
+```js
+process.exitCode = 1; // 设置 exitCode
+process.exit(2); // 使用状态码2
+```
+
+注意：调用 `process.exit()` 会强制进程尽快结束，即使仍然有很多处于等待中的异步操作没有全部执行完成， 包括输出到 `process.stdout` 和 `process.stderr` 的 I/O 操作。
+
+- `process.exit([exitCode])` 可以用来立即退出进程。即使当前有操作没执行完，比如 `process.exit()` 的代码逻辑，或者未完成的异步逻辑。
+- 写数据到 `process.stdout` 之后，立即调用 `process.exit()` 是不保险的，因为在 node 里面，往 `stdout` 写数据是非阻塞的，可以跨越多个事件循环。于是，可能写到一半就跪了。比较保险的做法是，通过 `process.exitCode` 设置退出码，然后等进程自动退出。
+- 如果程序出现异常，必须退出不可，那么，可以抛出一个未被捕获的 `error` ，来终止进程，这个比 `process.exit()` 安全。
+
+一个简单的例子，当满足一定条件时，使用 `process.exit()` 退出当前的进程，并且在进程退出时打印状态码 `code`。
+
+总之： `process.exit()` 接口不太靠谱，使用时请慎重。
+
+```js
+// 监听进程 exit 事件
+process.on('exit', function (code) {
+    console.log('About to exit with code: ', code);
+});
+
+var num = 3;
+setInterval(function () {
+    num -- ;
+    console.log('running');
+    if (num == 0) {
+        process.exit(1);
+    }
+}, 100);
+```
 
 ## 3.6 process.uptime()
 
+`process.uptime()` 方法返回当前 Node.js 进程运行时间秒长。
 
 ## 3.7 process.disconnect()
 
+如果 Node.js 进程是从 IPC 频道派生出来的（具体看 `Child Process` 和 `Cluster` 的文档）, `process.disconnect()` 函数会关闭到父进程的 IPC 频道，以允许子进程一旦没有其他链接来保持活跃就优雅地关闭。
+
+调用 `process.disconnect()` 的效果和父进程调用 `ChildProcess.disconnect()` 的一样`ChildProcess.disconnect()`.
+
+如果 Node.js 进程不是从IPC频道派生出来的，那调用 `process.disconnect()` 函数的结果是 `undefined`。
 
 # 4、事件
 
 ## 4.1 exit
 
+`exit` 事件会在以下两种情况下被触发：
+
+- 显式调用 `process.exit()` 方法，使得进程即将结束；
+- Node.js 事件循环数组中不再有额外的工作，使得 Node.js 进程即将结束。
+
+一旦所有与 `exit` 事件绑定的监听器执行完成，Node.js 的进程会终止。
+
+
+`exit` 事件监听器的回调函数，只有一个入参，这个参数的值可以是 `process.exitCode` 的属性值，或者是调用 `process.exit()` 方法时传入的 `exitCode` 值。
+
+例如：
+
+```js
+process.on('exit', code => {
+    console.log(`即将退出，退出码：${code}`);
+});
+```
+
+**`exit` 事件监听器的回调函数，只允许包含同步操作。**
+
+所有监听器的回调函数被调用后，任何在事件循环数组中排队的工作都会被强制丢弃，然后 Nodje.js 进程会立即结束。 例如在下例中，定时器中的操作永远不会被执行（因为不是同步操作）。
+
+```js
+process.on('exit', (code) => {
+  setTimeout(() => {
+    console.log('该函数不会被执行');
+  }, 0);
+});
+```
 
 ## 4.2 beforeExit
 
+当 Node.js 的事件循环数组已经为空，并且没有额外的工作被添加进来，事件 `beforeExit` 会被触发。
+
+如果进程由于显式的原因而将要终止，例如直接调用 `process.exit()` 或抛出未捕获的异常，`beforeExit` 事件不会被触发。
 
 ## 4.3 disconnect
 
+如果 Node.js 进程是由 IPC 通道的方式创建的（详见子进程和集群文档），当 IPC 通道关闭时，会触发 `disconnect` 事件。
 
 ## 4.4 message
+
+如果 Node.js 进程是由 IPC 通道的方式创建的（详见子进程和集群文档），当子进程收到父进程发送的消息时(消息通过 `childprocess.send()` 发送），会触发 `'message'` 事件。
+
+# 参考资料
+
+[node.js 官网：process - 进程](http://nodejs.cn/api/process.html)
+
+[nodejs-learning-guide：process 模块](https://github.com/chyingp/nodejs-learning-guide/blob/master/%E6%A8%A1%E5%9D%97/process.md)
 
 
 
