@@ -1,9 +1,7 @@
-const usage = process.cpuUsage();
+process.argv.forEach((val, index) => {
+    console.log(`${index}: ${val}`);
+});
 
-console.log(usage);
-console.log(process.arch);
-console.log(process.platform);
-
-console.log('hello');
-process.kill(process.pid, 'SIGHUP');
-console.log('world');
+console.log(process.argv[0]);
+console.log(process.argv0);
+console.log(process.env);
