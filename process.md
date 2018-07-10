@@ -13,7 +13,7 @@
 
 ## 2.1 process.argv
 
-`process.argv` 返回一个数组，由启动 Node.js 进程时的命令行参数所组成，第一个元素总是启动 Node.js 进程的可执行文件所在的绝对路径`（process.execPath）`，第二个是脚本文件名，其余元素是脚本文件的参数。
+`process.argv` 返回一个数组，由启动 Node.js 进程时的命令行参数所组成，第一个元素总是启动 Node.js 进程的可执行文件所在的绝对路径`（process.execPath）`，第二个是脚本文件名，其余元素是脚本文件的参数。
 
 `process-argv.js` 文件中有以下代码：
 
@@ -100,20 +100,81 @@ node
 }
 ```
 
+在实际开发中，经常会用到 `process.env` 来设置不同的环境变量，比如在 vue-cli 中，就设置了 `process.env.NODE_ENV = 'production'` 和 `process.env.NODE_ENV = 'development'` 来区分生产环境和开发环境。
+
 ## 2.4 process.execArgv
 
+`process.execArgv` 返回值是一个数组，包含的元素为 node.js 进程被启动时，Node.js 特定的命令行选项，这些选项在 `process.argv` 属性返回的数组中不会出现。这些选项在创建子进程时是有用的，因为他们包含了与父进程一样的执行环境信息。
+
+例如：
+
+```js
+$ node --harmony script.js --version
+```
+
+`process.execArgv` 的结果：
+
+```js
+['harmony']
+```
+
+`process.argv` 的结果：
+
+```js
+['/usr/local/bin/node', 'script.js', '--version']
+```
 
 ## 2.5 process.stdin && process.stdout
 
+`process.stdin` 和 `process.stdout` 分别代表进程的标准输入和标准输出，输入和输出都是从命令行中进行的。
+
+例如官网的例子，要求用户输入两个数值，然后把二者之和输出到终端。
+
+```js
+/*1:声明变量*/
+var num1, num2;
+/*2：向屏幕输出，提示信息，要求输入num1*/
+process.stdout.write('请输入num1的值：');
+/*3：监听用户的输入*/
+process.stdin.on('data', function (chunk) {
+    if (!num1) {
+        num1 = Number(chunk);
+        /*4：向屏幕输出，提示信息，要求输入num2*/
+        process.stdout.write('请输入num2的值：');
+    } else {
+        num2 = Number(chunk);
+        process.stdout.write('结果是：' + (num1 + num2));
+    }
+});
+```
+
+通过命令行运行上面的程序后，会让输入两个数值，然后会输出二者之和，如下所示：
+
+```js
+请输入num1的值：1
+请输入num2的值：2
+结果是：3
+```
 
 ## 2.6 process.arch
 
+`process.arch` 属性返回一个表示操作系统 CPU 架构的字符串，Node.js 二进制文件是为这些架构编译的。例如 `arm`, `arm64`, `ia32`, `mips`, `mipsel`, `ppc`, `ppc64`, `s390`, `s390x`, `x32`, 或 `x64`。
+
 ## 2.7 process.platform
+
+`process.platform` 属性返回字符串，标识 Node.js 进程运行其上的操作系统平台。
 
 ## 2.8 process.exitCode
 
+此数值标识进程结束的状态码。需要与 `process.exit([exitCode])` 一起使用。
+
 ## 2.9 process.connected
 
+`process.connected` 属性返回的是一个布尔值，代表的是进程间是否连接，如果连接，则返回 `true`，反之为 `false`。
+
+调用 `process.disconnected` 后，`process.connected` 返回为 `false`。
+
+`process.connected` 如果为 `false`，则不能通过 IPC channel 使用 `process.send()` 发送信息。
 
 # 3、 方法
 
