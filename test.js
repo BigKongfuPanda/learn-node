@@ -1,12 +1,14 @@
-process.on('exit', function (code) {
-    console.log('About to exit with code: ', code);
+const { spawn } = require('child_process');
+const ls = spawn('ls', ['-lh', '/usr']);
+
+ls.stdout.on('data', (data) => {
+  console.log(`输出：${data}`);
 });
 
-var num = 3;
-setInterval(function () {
-    num -- ;
-    console.log('running');
-    if (num == 0) {
-        process.exit(1);
-    }
-}, 100);
+ls.stderr.on('data', (data) => {
+  console.log(`错误：${data}`);
+});
+
+ls.on('close', (code) => {
+  console.log(`子进程退出码：${code}`);
+});
