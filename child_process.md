@@ -48,6 +48,24 @@ ls.on('close', (code) => {
 
 `spawn` 生成的子进程实例，有 `stdout` 和 `stderr` 对象，可以监听数据的输入。
 
+再看一个 `spawn` 方法中参数比较完整的例子：
+
+```js
+const process = require('process');
+const cp = require('child_process');
+let sp1 = cp.spawn('node', ['test1.js', 'one', 'two', 'three'], {cwd: './one'})
+let sp2 = cp.spawn('node', ['test2.js'], {stdio: 'pipe'});
+sp1.stdout.on('data', (data)=>{
+    console.log('子进程 sp1 标注输出：', data);
+    sp2.stdin.write(data);
+});
+
+sp1.on('exit', (code, signal)=>{
+    console.log('子进程 sp1 退出，退出代码为', code);
+    process.exit();
+});
+```
+
 ## 2.2 exec
 
 > child_process.exec(command[, options][, callback])  
@@ -67,24 +85,6 @@ exec('find . -type f | wc -l', (err, stdout, stderr) => {
   }
 
   console.log(`Number of files ${stdout}`);
-});
-```
-
-再看一个 `spawn` 方法中参数比较完整的例子：
-
-```js
-const process = require('process');
-const cp = require('child_process');
-let sp1 = cp.spawn('node', ['test1.js', 'one', 'two', 'three'], {cwd: './one'})
-let sp2 = cp.spawn('node', ['test2.js'], {stdio: 'pipe'});
-sp1.stdout.on('data', (data)=>{
-    console.log('子进程 sp1 标注输出：', data);
-    sp2.stdin.write(data);
-});
-
-sp1.on('exit', (code, signal)=>{
-    console.log('子进程 sp1 退出，退出代码为', code);
-    process.exit();
 });
 ```
 
