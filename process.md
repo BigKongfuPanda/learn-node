@@ -237,7 +237,7 @@ process.exit(2); // 使用状态码2
 一个简单的例子，当满足一定条件时，使用 `process.exit()` 退出当前的进程，并且在进程退出时打印状态码 `code`。
 
 ```js
-// 监听进程 exit 事件
+// 监听进程 exit 事件
 process.on('exit', function (code) {
     console.log('About to exit with code: ', code);
 });
