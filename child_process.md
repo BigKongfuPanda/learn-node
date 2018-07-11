@@ -18,7 +18,7 @@
 - `child_process.execFile()`: 类似 `child_process.exec()`，但直接衍生命令，且无需先衍生 `shell`。
 - `child_process.fork()`: 衍生一个新的 Node.js 进程，并通过建立 IPC 通讯通道来调用指定的模块，该通道允许父进程与子进程之间相互发送信息。
 - `child_process.execSync()`: `child_process.exec()` 的同步函数，会阻塞 Node.js 事件循环。
-- `child_process.execFileSync()`: c`hild_process.execFile()` 的同步函数，会阻塞 Node.js 事件循环。
+- `child_process.execFileSync()`: `child_process.execFile()` 的同步函数，会阻塞 Node.js 事件循环。
 
 ## 2.1 spawn
 
@@ -46,7 +46,7 @@ ls.on('close', (code) => {
 });
 ```
 
-`spawn` 生成的子进程实例，有 `stdout` 和 `stderr` 对象，可以监听数据的输入。
+`spawn` 生成的子进程实例，有 `stdout` 和 `stderr` 对象，可以监听数据的输入。
 
 ## 2.2 exec
 
@@ -55,7 +55,7 @@ ls.on('close', (code) => {
 >  - options: 选项。`cwd`: 子进程的当前工作目录。`encoding`: 默认为 `'utf8'`。`maxBuffer`: stdout 或 stderr 允许的最大字节数。默认为 200*1024。如果超过限制，则子进程会被终止。
 >  - callback(error, stdout, stderr): 进程终止时调用
 
-`exec` 创建子进程的时候，会衍生一个 `shell` 并在 `shell` 中执行 `command`，且缓冲任何产生的输出。 传入函数的 `command` 字符串会被 `shell` 直接处理。
+`exec` 创建子进程的时候，会衍生一个 `shell` 并在 `shell` 中执行 `command`，且缓冲任何产生的输出。 传入函数的 `command` 字符串会被 `shell` 直接处理。
 
 ```js
 const { exec } = require('child_process');
@@ -70,7 +70,7 @@ exec('find . -type f | wc -l', (err, stdout, stderr) => {
 });
 ```
 
-## 2.2.1 `spawn` 和 `exec` 方法的相同点：
+## 2.2.1 `spawn` 和 `exec` 方法的相同点：
 
 - 它们都用于开一个子进程执行指定命令。
 
@@ -78,7 +78,7 @@ exec('find . -type f | wc -l', (err, stdout, stderr) => {
 
 - 它们都返回一个 `ChildProcess` 对象，所以他们都可以取得子进程的标准输入流，标准输出流和标准错误流 。
 
-## 2.2.2 `spawn` 和 `exec` 方法的不同点：
+## 2.2.2 `spawn` 和 `exec` 方法的不同点：
 
 - 接受参数的方式： `spawn` 使用了参数数组，而 `exec` 则直接接在命令后。
 
@@ -86,9 +86,9 @@ exec('find . -type f | wc -l', (err, stdout, stderr) => {
 
 - 回调函数： `exec` 方法相比 `spawn` 方法，多提供了一个回调函数，可以更便捷得获取子进程输出。这与为返回的 `ChildProcess` 对象的 `stdout` 或 `stderr` 监听 `data` 事件来获得输出的区别在于： `data` 事件的方式，会在子进程一有数据时就触发，并把数据返回给Node。而回调函数，则会先将数据缓存在内存中（数据量小于 `maxBuffer` 参数），等待子进程运行完毕后，再调用回调函数，并把最终数据交给回调函数。
 
-因为 `exec` 方法会在将所有的数据缓冲起来，所以有 `maxBuffer` 大小的限制，因此当数据量小，并且需要使用 `shell` 语法来创建子进程的时候，使用 `exec` 方法是个不错的选择。
+因为 `exec` 方法会在将所有的数据缓冲起来，所以有 `maxBuffer` 大小的限制，因此当数据量小，并且需要使用 `shell` 语法来创建子进程的时候，使用 `exec` 方法是个不错的选择。
 
-然而，当数据量比较大的时候，只好选择 `spawn` 方法来创建子进程，这是因为 `spawn` 方法中数据是以 `stream` 的方式来保存的。
+然而，当数据量比较大的时候，只好选择 `spawn` 方法来创建子进程，这是因为 `spawn` 方法中数据是以 `stream` 的方式来保存的。
 
 ## 2.3 execFile
 
@@ -117,9 +117,9 @@ const child = execFile('node', ['--version'], (error, stdout, stderr) => {
 >  - args <Array> : 字符串参数列表。  
 >  - options: 选项
 
-`fork` 方法是 `spawn` 方法的变形的一种形式，也是用来创建进程。二者最大的不同之处在于：`fork` 方法会创建一个内置的通信信道，允许消息在父进程和子进程之间来回传递。以下有个例子：
+`fork` 方法是 `spawn` 方法的变形的一种形式，也是用来创建进程。二者最大的不同之处在于：`fork` 方法会创建一个内置的通信信道，允许消息在父进程和子进程之间来回传递。以下有个例子：
 
-parent.js 文件中的代码如下：
+parent.js 文件中的代码如下：
 
 ```js
 const {fork} = require('child_process');
@@ -160,9 +160,9 @@ Message from child: { counter: 4 }
 ...
 ```
 
-在 `parent.js` 中，使用 `fork` 方法创建了一个子进程实例 `forked`，并且指定了子进程的的运行目录为 `child.js` 。给实例 `forked` 绑定了 `message` 事件，当子进程(child.js)中使用 `process.send` 发送数据的时候，会触发 `message` 事件。
+在 `parent.js` 中，使用 `fork` 方法创建了一个子进程实例 `forked`，并且指定了子进程的的运行目录为 `child.js` 。给实例 `forked` 绑定了 `message` 事件，当子进程(child.js)中使用 `process.send` 发送数据的时候，会触发 `message` 事件。
 
-同时，父进程向子进程中发送数据的时候，通过 `forked.send` 来进行，参数为一个对象。
+同时，父进程向子进程中发送数据的时候，通过 `forked.send` 来进行，参数为一个对象。
 
 # 3、子进程的事件
 
