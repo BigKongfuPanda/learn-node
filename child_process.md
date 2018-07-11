@@ -70,6 +70,24 @@ exec('find . -type f | wc -l', (err, stdout, stderr) => {
 });
 ```
 
+再看一个 `spawn` 方法中参数比较完整的例子：
+
+```js
+const process = require('process');
+const cp = require('child_process');
+let sp1 = cp.spawn('node', ['test1.js', 'one', 'two', 'three'], {cwd: './one'})
+let sp2 = cp.spawn('node', ['test2.js'], {stdio: 'pipe'});
+sp1.stdout.on('data', (data)=>{
+    console.log('子进程 sp1 标注输出：', data);
+    sp2.stdin.write(data);
+});
+
+sp1.on('exit', (code, signal)=>{
+    console.log('子进程 sp1 退出，退出代码为', code);
+    process.exit();
+});
+```
+
 ## 2.2.1 `spawn` 和 `exec` 方法的相同点：
 
 - 它们都用于开一个子进程执行指定命令。
@@ -119,7 +137,7 @@ const child = execFile('node', ['--version'], (error, stdout, stderr) => {
 
 `fork` 方法是 `spawn` 方法的变形的一种形式，也是用来创建进程。二者最大的不同之处在于：`fork` 方法会创建一个内置的通信信道，允许消息在父进程和子进程之间来回传递。以下有个例子：
 
-parent.js 文件中的代码如下：
+parent.js 文件中的代码如下：
 
 ```js
 const {fork} = require('child_process');
@@ -195,6 +213,8 @@ forked.send({hello: 'world'});
 ```
 
 # 参考资料
+
+[Node.js 官方文档：child_process 子进程](http://nodejs.cn/api/child_process.html#child_process_class_childprocess)
 
 [Node.js Child Processes: Everything you need to know](https://medium.freecodecamp.org/node-js-child-processes-everything-you-need-to-know-e69498fe970a)
 
