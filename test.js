@@ -1,12 +1,9 @@
-process.on('exit', function (code) {
-    console.log('About to exit with code: ', code);
+const {fork} = require('child_process');
+
+const forked = fork('child.js');
+
+forked.on('message', (msg) => {
+    console.log('Message from child:',  msg);
 });
 
-var num = 3;
-setInterval(function () {
-    num -- ;
-    console.log('running');
-    if (num == 0) {
-        process.exit(1);
-    }
-}, 100);
+forked.send({hello: 'world'});
