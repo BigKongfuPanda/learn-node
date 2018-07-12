@@ -531,7 +531,7 @@ http.createServer(function (req, res) {
 
 # 参考资料
 
-[Node.js 官方文档：cluster 集群](http://nodejs.cn/api/cluster.html)
+[Node.js 官方文档：cluster 集群](http://nodejs.cn/api/cluster.html)
 
 [node.js-learning-guide: cluster 模块](https://github.com/chyingp/nodejs-learning-guide/blob/master/%E6%A8%A1%E5%9D%97/cluster.md)
 
