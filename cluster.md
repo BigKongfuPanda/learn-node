@@ -328,7 +328,7 @@ if (cluster.isMaster) {
 
 输出结果：
 
-```js
+```
 fork：worker1
 fork：worker2
 fork：worker3
