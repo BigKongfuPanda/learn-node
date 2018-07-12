@@ -200,12 +200,12 @@ if (cluster.isMaster) {
 
 # 3、cluster 的事件
 
-- 'fork'： 监听创建 `worker` 进程事件
-- 'online'： 监听 `worker` 创建成功事件
-- 'listening'： 监听 `worker` 进程进入监听事件
-- 'disconnect'： 监听 `worker` 断开事件
-- 'exit'： 监听 `worker` 退出事件
-- 'message'：监听 `worker` 进程发送消息事件
+- `fork`： 监听创建 `worker` 进程事件
+- `online`： 监听 `worker` 创建成功事件
+- `listening`： 监听 `worker` 进程进入监听事件
+- `disconnect`： 监听 `worker` 断开事件
+- `exit`： 监听 `worker` 退出事件
+- `message`：监听 `worker` 进程发送消息事件
 
 ## 3.1 fork 事件
 
