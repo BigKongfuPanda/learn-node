@@ -1,7 +1,7 @@
 # 目录
 
 - 概述
-- cluster 的属性和方法
+- cluster 的属性和方法
 - cluster 的事件
 - worker 的属性和方法
 - worker 的事件
@@ -11,17 +11,17 @@
 
 Node.js 默认单进程运行，对于多核 CPU 的计算机来说，这样做效率很低，因为只有一个核在运行，其他核都在闲置，面对单进程单线程对多核使用不足的问题，前人的经验是启动多进程。理想的状态下每个进程各自利用一个 CPU ，以此实现多核 CPU 的利用。
 
-Master-Worker模式：`cluster` 模块允许设立一个主进程和若干个 `worker` 进程，由主进程监控和协调 `worker` `进程的运行，worker` 之间采用进程间（IPC）通信交换信息，`cluster` 模块内置一个负载均衡器，协调各个进程之间的负载。这是典型的分布式架构中用于并行处理业务的模式，具备较好的可伸缩性和稳定性。主进程不负责具体的业务处理，而是负责调度或管理工作进程，他是趋向于稳定为。工作进程负责具体的业务处理。
+Master-Worker 模式：`cluster` 模块允许设立一个主进程和若干个 `worker` 进程，由主进程监控和协调 `worker` `进程的运行，worker` 之间采用进程间（IPC）通信交换信息，`cluster` 模块内置一个负载均衡器，协调各个进程之间的负载。这是典型的分布式架构中用于并行处理业务的模式，具备较好的可伸缩性和稳定性。主进程不负责具体的业务处理，而是负责调度或管理工作进程，他是趋向于稳定为。工作进程负责具体的业务处理。
 
 通过 `fork()` 复制的进程都是一个独立的进程，这个进程中有着独立的 V8 实例。 `fork()` 进程是昂贵的。Node 通过事件驱动的方式在单线程上解决了大并发的问题，启动多个进程只是为了充分将 CPU 资源利用起来，而不是为了解决并发问题。
 
-# 2、cluster 的属性和方法
+# 2、cluster 的属性和方法
 
-cluster.isMaster：标志是否 master 进程，为 true 则是。
+- `cluster.isMaster`：标志是否 `master` 进程，为 `true` 则是。
 
-cluster.isWorker：标志是否 worker 进程，为 true 则是。
+- `cluster.isWorker`：标志是否 `worker` 进程，为 `true` 则是。
 
-cluster.worker：获得当前的 worker 对象，在 master 进程中使用无效。
+- `cluster.worker`：获得当前的 `worker` 对象，在 `master` 进程中使用无效。
 
 ```js
 const cluster = require('cluster');
@@ -35,7 +35,7 @@ if (cluster.isMaster) {
 }
 ```
 
-cluster.workers： 获得集群中所有存活的 `worker` 对象。在 `worker` 进程使用无效。
+- `cluster.workers`： 获得集群中所有存活的 `worker` 对象。在 `worker` 进程使用无效。
 
 `cluster.workers` 输出后如下面所示，一个例子：
 
@@ -194,18 +194,18 @@ cluster.workers： 获得集群中所有存活的 `worker` 对象。在 `worker`
         _disconnect: [Function] } } }
 ```
 
-cluster.fork()： 创建工作进程 `worker` 。
+- `cluster.fork()`： 创建工作进程 `worker` 。
 
-cluster.disconnect([callback])： 断开所有 `worker` 进程通信。这个方法可以选择添加一个回调参数，当结束时会调用这个回调函数。这个方法只能由主进程调用。
+- `cluster.disconnect([callback])`： 断开所有 `worker` 进程通信。这个方法可以选择添加一个回调参数，当结束时会调用这个回调函数。这个方法只能由主进程调用。
 
 # 3、cluster 的事件
 
-Event: 'fork'： 监听创建 worker 进程事件
-Event: 'online'： 监听 worker 创建成功事件
-Event: 'listening'： 监听 worker 进程进入监听事件
-Event: 'disconnect'： 监听 worker 断开事件
-Event: 'exit'： 监听 worker 退出事件
-Event: 'message'：监听 worker 进程发送消息事件
+- 'fork'： 监听创建 `worker` 进程事件
+- 'online'： 监听 `worker` 创建成功事件
+- 'listening'： 监听 `worker` 进程进入监听事件
+- 'disconnect'： 监听 `worker` 断开事件
+- 'exit'： 监听 `worker` 退出事件
+- 'message'：监听 `worker` 进程发送消息事件
 
 ## 3.1 fork 事件
 
@@ -355,9 +355,9 @@ worker3 listening on 127.0.0.1:3000
 
 在一个主进程中使用 `cluster.workers` 来获取 `worker` 对象；在一个工作进程中，使用 `cluster.worker` 来获取 `worker` 对象。
 
-- id 属性，返回当前 `worker` 的 进程编号。
-- process 属性，返回 `worker` 所在的进程对象。所有的工作进程都是通过 `child_process.fork()` 来创建的，这个方法返回的对象被存储为 `.process` 。在工作进程中， `process` 属于全局对象。
-- send() 方法，发送一个消息给工作进程或者主进程，参数 `message` 、`callback`。
+- `id` 属性，返回当前 `worker` 的 进程编号。
+- `process` 属性，返回 `worker` 所在的进程对象。所有的工作进程都是通过 `child_process.fork()` 来创建的，这个方法返回的对象被存储为 `.process` 。在工作进程中， `process` 属于全局对象。
+- `send()` 方法，发送一个消息给工作进程或者主进程，参数 `message` 、`callback`。
 
 ```js
 //这个例子里面，工作进程将主进程发送的消息echo回去。
@@ -372,10 +372,10 @@ if (cluster.isMaster) {
 }
 ```
 
-- disconnect() 方法，在一个工作进程中，调用此方法会关闭所有 `server`，并等待这些 `server` 的 `close` 事件执行，然后关闭 IPC 管道。
-- isConnected() 方法，返回是否链接到主进程。
-- isDead() 方法，返回工作进程是否被终止。
-- kill([signal]) 方法，`kill` 工作进程。
+- `disconnect()` 方法，在一个工作进程中，调用此方法会关闭所有 `server`，并等待这些 `server` 的 `close` 事件执行，然后关闭 IPC 管道。
+- `isConnected()` 方法，返回是否链接到主进程。
+- `isDead()` 方法，返回工作进程是否被终止。
+- `kill([signal])` 方法，`kill` 工作进程。
 
 代码示例：
 
@@ -443,12 +443,12 @@ if (cluster.isMaster) {
 
 # 5、worker 的事件
 
-- listening 和cluster.on(‘listening’)事件类似，但针对特定的工作进程
-- online 和cluster.on(‘online’)事件类似，但针对特定的工作进程
-- disconnect 事件，主进程和工作进程之间 IPC 通道断开后触发
-exit 事件，当前工作进程退出时触发，回调参数 code 退出码、signal 进程被 kill 时的信号
-- message 事件，当前进程接收主进程发送的消息后触发，message 消息，handle 处理，旧版本没有 worker 参数
-- error 事件，此事件和 child_process.fork() 提供的error事件相同
+- `listening` 和 `cluster.on('listening')` 事件类似，但针对特定的工作进程。
+- `online` 和 `cluster.on('online')` 事件类似，但针对特定的工作进程。
+- `disconnect` 事件，主进程和工作进程之间 IPC 通道断开后触发。
+- `exit` 事件，当前工作进程退出时触发，回调参数 `code` 退出码、`signal` 进程被 `kill` 时的信号。
+- `message` 事件，当前进程接收主进程发送的消息后触发，`message` 消息，`handle` 处理，旧版本没有 `worker` 参数。
+- `error` 事件，此事件和 `child_process.fork()` 提供的 `error` 事件相同。
 
 示例代码：
 
