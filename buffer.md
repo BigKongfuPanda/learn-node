@@ -2,11 +2,11 @@
 
 - 概述
 - 创建 Buffer 实例
-- 判断数据是否为 buffer
+- 判断数据是否为 buffer
 - 判断两个 buffer 是否相等
 - 写入 buffer: buf.write()
 - 读取 buffer: buf.toString()
-- 拷贝 buffer: buf.copy()
+- 拷贝 buffer: buf.copy()
 - 合并 buffer: buf.cancat()
 - 切割 buffer: buf.slice()
 - 将 buffer 转为 JSON 对象: buf.toJSON()
@@ -87,7 +87,7 @@ console.log(buf);
 - `Buffer.from(string[, encoding])`: 新建一个包含所给的 JavaScript 字符串 `string` 的 `Buffer` 。 `encoding` 参数指定 `string` 的字符编码，默认为 `utf-8`。
 - `Buffer.from(buffer)`: 将传入的 `buffer` 数据拷贝到一个新建的 `Buffer` 实例。
 
-# 3、判断数据是否为 buffer
+# 3、判断数据是否为 buffer
 
 > Buffer.isBuffer(obj)
 
@@ -104,10 +104,10 @@ console.log(buf);
 > buf.write(string[, offset[, length]][, encoding])
 
 参数说明：
-- string: 要写入 `buf` 的字符串
+- string: 要写入 `buf` 的字符串
 - offset: 开始写入 `string` 前要跳过的字节数。默认：0
 - length: 要写入的字节数。默认：buf.length - offset
-- encoding: `string` 的字符编码。默认：'utf8'
+- encoding: `string` 的字符编码。默认：'utf8'
 - 返回值：写入的字节数
 
 根据 `encoding` 的字符编码写入 `string` 到 `buf` 中的 `offset` 位置。 `length` 参数是写入的字节数。 如果 `buf` 没有足够的空间保存整个字符串，则只会写入 `string` 的一部分。 只部分解码的字符不会被写入。
@@ -119,8 +119,8 @@ console.log(buf);
 参数说明：
 
 - encoding: 解码使用的字符编码。默认：`utf8`
-- start: 开始解码的字节偏移量。默认：0
-- end： 结束解码的字节偏移量（不包含）。默认：`buf.length`
+- start: 开始解码的字节偏移量。默认：0
+- end： 结束解码的字节偏移量（不包含）。默认：`buf.length`
 - 返回值：字符串
 
 根据 `encoding` 指定的字符编码解码 `buf` 成一个字符串。 `start` 和 `end` 可传入用于只解码 `buf` 的一部分。
