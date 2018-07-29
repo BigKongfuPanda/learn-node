@@ -12,6 +12,7 @@ console.log('Static root dir: ' + root);
 let server = http.createServer((request, response) => {
   // 获取URL的path，类似 '/index.html'
   let pathname = url.parse(request.url).pathname;
+  console.log(pathname);
   // 获取对应的本地文件路径，类似 '/http/index.html'
   let filepath = path.join(root, pathname);
   // 获取文件状态：

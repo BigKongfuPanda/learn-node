@@ -1,20 +1,19 @@
-const buf1 = Buffer.allocUnsafe(26);
-for (let i = 0; i < 26; i++) {
-    buf1[i] = i + 97;
-}
-const buf2 = buf1.slice(0, 3);
+const http = require('http');
+const url = require('url');
 
-console.log(buf2.toString('ascii', 0, buf2.length));
-// 输出：abc
+// https.get('https://www.baidu.com', res => {
+//     console.log('status code: ', res.statusCode);
+//     console.log('headers: ', res.headers);
 
-// 修改buf1, buf2也会跟着改变
-buf1[0] = 33;
-// 输出: !bc
-console.log(buf2.toString('ascii', 0, buf2.length));
+//     res.on('data', data => {
+//         process.stdout.write(data);
+//     });
+// }).on('error', err => {
+//     console.log(err);
+// });
 
-buf2[0] = 44;
-// 输出: ,bcdefghijklmnopqrstuvwxyz
-console.log(buf1.toString('ascii', 0, buf1.length));
-
-const buf3 = Buffer.alloc(3);
-console.log(buf3.toJSON());
+http.createServer((req, res) => {
+    res.writeHead(200, {'Content-Type': 'text/plain; charset=utf-8'});
+    let queryObj = url.parse(req.url, true).query;
+    res.end(JSON.stringify(queryObj));
+}).listen(3000);
