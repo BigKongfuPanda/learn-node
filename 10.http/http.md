@@ -6,7 +6,7 @@
 
 # 1、概述
 
-我们知道传统的 HTTP 服务器是由 `Aphche` 、 `Nginx` 、 `IIS` 之类的软件来搭建的，但是 `Nodejs` 并不需要， `Nodejs` 提供了 `http` 模块，自身就可以用来构建服务器。`http` 模块内部封装了高效的 `http` 服务器 和 `http` 客户端。 
+我们知道传统的 HTTP 服务器是由 `Aphche` 、 `Nginx` 、 `IIS` 之类的软件来搭建的，但是 `Nodejs` 并不需要， `Nodejs` 提供了 `http` 模块，自身就可以用来构建服务器。`http` 模块内部封装了高效的 `http` 服务器 和 `http` 客户端。 
 
 `http` 模块提供两种使用方式：
 
@@ -27,13 +27,13 @@ http.createServer((request, response) => {
     response.end('hello world');
 }).listen(3000);
 ```
-
+
 上述代码创建了一个服务器，监听了 3000 端口，访问 `localhost: 3000` ，返回的信息是 `hello world`。
 
 
 ## 2.2 请求信息 request 对象
 
-继承于 `http.IncomingMessag` 类，是 `http.server()` 类的 `request` 事件的第一个参数，也即是 `http.createServer(req, res)` 的第一个参数。
+继承于 `http.IncomingMessag` 类，是 `http.server()` 类的 `request` 事件的第一个参数，也即是 `http.createServer(req, res)` 的第一个参数。
 
 HTTP请求本质上是一个数据流，由请求头（headers）和请求体（body）组成。例如以下是一个完整的HTTP请求数据内容。
 
@@ -54,7 +54,7 @@ Hello World
 
 ```js
 http.createServer((req, res) => {
-    console.log('1.请求url：' + req.url);
+    console.log('1.请求url：' + req.url);
     console.log('2.请求方法：' + req.method);
     console.log('3.HTTP 版本：' + req.httpVersion);
     console.log('4.请求头：' + JSON.stringify(req.headers));
@@ -73,7 +73,7 @@ http.createServer((req, res) => {
 
 ## 2.3 响应信息 response 对象
 
-继承于 `http.ServerResponse` 类，是 `http.server()` 类的 `request` 事件的第二个参数，也即是 `http.createServer(req, res)` 的第二个参数。
+继承于 `http.ServerResponse` 类，是 `http.server()` 类的 `request` 事件的第二个参数，也即是 `http.createServer(req, res)` 的第二个参数。
 
 HTTP 响应本质上也是一个数据流，同样由响应头（headers）和响应体（body）组成。例如以下是一个完整的HTTP请求数据内容。
 
@@ -164,7 +164,7 @@ http.createServer((req, res) => {
 }).listen(3000);
 ```
 
-在浏览器中打开：http://localhost:3000/user?name=tom&age=15， 返回的结果如下所示：
+在浏览器中打开：http://localhost:3000/user?name=tom&age=15， 返回的结果如下所示：
 
 ```js
 {
@@ -183,7 +183,7 @@ http.createServer((req, res) => {
 }
 ```
 
-其中，`query` 是 `GET` 请求的参数，因为 `GET` 请求是没有请求体的，参数都是拼接在 `url` 后面的：
+其中，`query` 是 `GET` 请求的参数，因为 `GET` 请求是没有请求体的，参数都是拼接在 `url` 后面的：
 
 ```js
 const http = require('http');
@@ -196,7 +196,7 @@ http.createServer((req, res) => {
 }).listen(3000);
 ```
 
-在浏览器中打开：http://localhost:3000/user?name=tom&age=15， 返回的结果如下所示：
+在浏览器中打开：http://localhost:3000/user?name=tom&age=15， 返回的结果如下所示：
 
 ```js
 {"name":"tom","age":"15"}
@@ -294,11 +294,9 @@ http.get('http://nodejs.org/dist/index.json', (res) => {
 
   let error;
   if (statusCode !== 200) {
-    error = new Error('请求失败。\n' +
-                      `状态码: ${statusCode}`);
+    error = new Error('请求失败。\n' + `状态码: ${statusCode}`);
   } else if (!/^application\/json/.test(contentType)) {
-    error = new Error('无效的 content-type.\n' +
-                      `期望 application/json 但获取的是 ${contentType}`);
+    error = new Error('无效的 content-type.\n' + `期望 application/json 但获取的是 ${contentType}`);
   }
   if (error) {
     console.error(error.message);
