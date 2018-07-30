@@ -227,8 +227,103 @@ http.createServer(function (request, response) {
 
 # 3、http 客户端
 
+`http` 模块提供了 `http.request()` 和 `http.get()` 两个方法，功能是作为客户端向 `http` 服务器发起请求。
 
+## 3.1 http.request()
 
+首先来看 `http.request()` ，`http.request()` 返回一个 `http.ClientRequest` 类的实例。
+
+> http.request(options[, callback])
+
+- `options` 可以是一个对象、或字符串、或 `URL` 对象。 如果 `options` 是一个字符串，它会被自动使用 `url.parse()` 解析。 如果它是一个 `URL` 对象, 它会被默认转换成一个 `options` 对象。
+- 可选的 `callback` 参数会作为单次监听器被添加到 `'response'` 事件。
+
+官网上面的例子：
+
+```js
+const postData = querystring.stringify({
+  'msg' : 'Hello World!'
+});
+
+const options = {
+  hostname: 'www.google.com',
+  port: 80,
+  path: '/upload',
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/x-www-form-urlencoded',
+    'Content-Length': Buffer.byteLength(postData)
+  }
+};
+
+const req = http.request(options, (res) => {
+  console.log(`状态码: ${res.statusCode}`);
+  console.log(`响应头: ${JSON.stringify(res.headers)}`);
+  res.setEncoding('utf8');
+  res.on('data', (chunk) => {
+    console.log(`响应主体: ${chunk}`);
+  });
+  res.on('end', () => {
+    console.log('响应中已无数据。');
+  });
+});
+
+req.on('error', (e) => {
+  console.error(`请求遇到问题: ${e.message}`);
+});
+
+// 写入数据到请求主体
+req.write(postData);
+req.end();
+```
+
+注意，在例子中调用了 `req.end()`。 **使用 `http.request()` 必须总是调用 `req.end()` 来表明请求的结束，即使没有数据被写入请求主体。**
+
+## 3.2 http.get()
+
+> http.get(options[, callback])
+
+`http.get()` 方法是 `http.request()` 方法的便捷方法。因为大多数请求都是 GET 请求且不带请求主体，所以 Node.js 提供了该便捷方法。
+
+**该方法与 `http.request()` 唯一的区别是它设置请求方法为 `GET` 且自动调用 `req.end()`。**
+
+```js
+http.get('http://nodejs.org/dist/index.json', (res) => {
+  const { statusCode } = res;
+  const contentType = res.headers['content-type'];
+
+  let error;
+  if (statusCode !== 200) {
+    error = new Error('请求失败。\n' +
+                      `状态码: ${statusCode}`);
+  } else if (!/^application\/json/.test(contentType)) {
+    error = new Error('无效的 content-type.\n' +
+                      `期望 application/json 但获取的是 ${contentType}`);
+  }
+  if (error) {
+    console.error(error.message);
+    // 消耗响应数据以释放内存
+    res.resume();
+    return;
+  }
+
+  res.setEncoding('utf8');
+  let rawData = '';
+  res.on('data', (chunk) => { rawData += chunk; });
+  res.on('end', () => {
+    try {
+      const parsedData = JSON.parse(rawData);
+      console.log(parsedData);
+    } catch (e) {
+      console.error(e.message);
+    }
+  });
+}).on('error', (e) => {
+  console.error(`错误: ${e.message}`);
+});
+```
+
+其实 `http` 服务端和 `http` 客户端均有很多事件，但是因为太杂，就不展开去说了。对于 `http` 服务端，最重要的事件就是 `request` 事件，对于 http 客户端，最重要的事件是 `response` 事件。
 
 # 参考资料
 
