@@ -3,6 +3,24 @@ const fs = require('fs');
 const path = require('path');
 const mime = require('mime');
 const cache = {};
+const chatServer = require('./lib/chat-server');
+chatServer.listen(server);
+
+
+/**
+ * 创建http服务器
+ */
+const server = http.createServer((request, response) => {
+    let filePath = '',
+        absPath = '';
+
+    filePath = request.url === '/' ? 'public/index.html' : 'public' + request.url;
+    absPath = './' + filePath;
+
+    serveStatic(response, cache, absPath);
+});
+
+server.listen(3000, () => {console.log('Server listening on localhost:3000');})
 
 /**
  * 提供静态文件服务
@@ -50,7 +68,6 @@ const send404 = (response) => {
  * @param {buffer/string} fileContents 文件内容
  */
 const sendFile = (response, filePath, fileContents) => {
-    response.writeHead(200, {'Content-Type': mime.lookup(path.basename(filePath))});
+    response.writeHead(200, {'Content-Type': mime.getType(path.basename(filePath))});
     response.end(fileContents);
 }
-
