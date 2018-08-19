@@ -3,9 +3,12 @@ const fs = require('fs');
 const path = require('path');
 const mime = require('mime');
 const cache = {};
+
+/**
+ * 设置 Socket.io 服务器，给它提供一个已经定义好的 HTTP 服务器，这样它就能跟HTTP服务器共享同一 个TCP/IP端口
+ */
 const chatServer = require('./lib/chat-server');
 chatServer.listen(server);
-
 
 /**
  * 创建http服务器
